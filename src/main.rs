@@ -5,33 +5,35 @@ fn main() {
     println!("=======================");
     println!("Welcome to the todo cli");
     println!("=======================");
-    println!();
 
-    println!("Enter a command: ");
-    println!("1. Add a todo");
-    println!("2. List todos");
-    println!("3. Complete a todo");
-    println!("4. Delete all todos");
-    println!("5. Exit");
+    loop {
+        println!();
+        println!("Enter a command: ");
+        println!("1. Add a todo");
+        println!("2. List todos");
+        println!("3. Complete a todo");
+        println!("4. Delete all todos");
+        println!("5. Exit");
 
-    let mut command = String::new();
-    
-    io::stdin()
-        .read_line(&mut command)
-        .expect("Failed to read line");
+        let mut command = String::new();
 
-    let command: u8 = match command.trim().parse(){
-        Ok(num) => num,
-        Err(_) => panic!("Invalid command"),
-    };
+        io::stdin()
+            .read_line(&mut command)
+            .expect("Failed to read line");
 
-    match command {
-        1 => add_todo(),
-        2 => list_todos(),
-        3 => complete_todo(),
-        4 => delete_todos(),
-        5 => exit(),
-        _ => invalid_command()
+        let command: u8 = match command.trim().parse(){
+            Ok(num) => num,
+            Err(_) => continue,
+        };
+
+        match command {
+            1 => add_todo(),
+            2 => list_todos(),
+            3 => complete_todo(),
+            4 => delete_todos(),
+            5 => break,
+            _ => invalid_command()
+        }
     }
 }
 
@@ -96,10 +98,6 @@ fn complete_todo() {
     println!("You chose to complete todo: {}", todos[todo_number]);
 
     todo_io::delete_todo_from_file(todo_number);
-}
-
-fn exit() {
-    println!("Exiting...");
 }
 
 fn invalid_command() {
