@@ -98,9 +98,13 @@ fn complete_todo() {
         Err(_) => panic!("Invalid command"),
     };
 
-    println!("You chose to complete todo: {}", todos[todo_number]);
+    let Some(todo) = todos.get(todo_number) else {
+        println!("Invalid todo number");
+        return;
+    };
 
-    todo_io::delete_todo_from_file(todo_number);
+    println!("Updating todo: {}", todo);
+    todo_io::update_todo(todo_number).expect("failed to update todo");
 }
 
 fn invalid_command() {
