@@ -3,6 +3,9 @@ use std::fs::read_to_string;
 use std::io::Write;
 use std::path::Path;
 
+use crate::Todo;
+use crate::TodoStatus;
+
 const FILE_PATH: &str = "./todos.txt";
 
 fn create_file_if_not_exists() {
@@ -13,7 +16,7 @@ fn create_file_if_not_exists() {
     }
 }
 
-pub(crate) fn write_todo_to_file(todo: &str) {
+pub(crate) fn write_todo_to_file(todo: &Todo) {
     create_file_if_not_exists();
 
     let mut file = File::options()
@@ -21,20 +24,31 @@ pub(crate) fn write_todo_to_file(todo: &str) {
         .open(FILE_PATH)
         .expect("failed to open file");
 
-    write!(file, "{}", todo)
+    write!(file, "{} - {:?}\n", todo.name, todo.status)
         .expect("failed to writeln");
 }
 
-pub(crate) fn get_all_todos_from_file() -> Vec<String> {
+pub(crate) fn get_all_todos_from_file() -> Vec<Todo> {
     create_file_if_not_exists();
 
-    let lines = read_to_string(FILE_PATH)
-        .unwrap()
+    read_to_string(FILE_PATH)
+        .expect("failed to read todos file")
         .lines()
-        .map(|line| line.to_string())
-        .collect();
+        .map(|line| {
+            let (name, status) = line
+                .rsplit_once(" - ")
+                .expect("invalid todo item");
 
-    lines
+            let status = match status {
+                "Done" => TodoStatus::Done,
+                "NotDone" => TodoStatus::NotDone,
+                _ => panic!("Invalid todo status: {status}"),
+            };
+            
+            Todo::new_from_file(name, status)
+
+        })
+        .collect()
 }
 
 pub(crate) fn delete_todo_from_file(line_number: usize) {

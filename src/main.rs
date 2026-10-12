@@ -1,4 +1,4 @@
-use std::io;
+use std::{fmt, io};
 mod todo_io;
 
 fn main() {
@@ -47,9 +47,9 @@ fn add_todo() {
 
     let new_todo = Todo::new(&todo_name); 
 
-    println!("Todo added: {:?}", new_todo);
+    println!("Todo added: {}", new_todo);
 
-    todo_io::write_todo_to_file(&new_todo.name)
+    todo_io::write_todo_to_file(&new_todo)
 }
 
 fn list_todos() {
@@ -82,7 +82,7 @@ fn complete_todo() {
     println!("What todo would you like to complete?");
 
     for (i, todo) in todos.iter().enumerate() {
-        println!("{}. todo: {}", i, todo)
+        println!("{}. todo: {:?}", i, todo)
     }
     
     let mut chosen_todo = String::new();
@@ -116,11 +116,24 @@ struct Todo {
     status: TodoStatus
 }
 
+impl fmt::Display for Todo {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {:?})", self.name, self.status)
+    }
+}
+
 impl Todo {
     fn new(name: &str) -> Todo {
         Todo {
-            name: name.to_owned(),
+            name: name.trim().to_owned(),
             status: TodoStatus::NotDone
+        }
+    }
+
+    fn new_from_file(name: &str, status: TodoStatus) -> Todo {
+        Todo {
+            name: name.trim().to_owned(),
+            status: status
         }
     }
 }
