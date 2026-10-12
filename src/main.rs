@@ -1,5 +1,8 @@
-use std::{fmt, io};
+use std::io;
+mod todo;
 mod todo_io;
+
+use todo::Todo;
 
 fn main() {
     println!("=======================");
@@ -82,7 +85,7 @@ fn complete_todo() {
     println!("What todo would you like to complete?");
 
     for (i, todo) in todos.iter().enumerate() {
-        println!("{}. todo: {:?}", i, todo)
+        println!("{}. todo: {}", i, todo)
     }
     
     let mut chosen_todo = String::new();
@@ -102,38 +105,4 @@ fn complete_todo() {
 
 fn invalid_command() {
     println!("Invalid command");
-}
-
-#[derive(Debug)]
-enum TodoStatus {
-    Done,
-    NotDone
-}
-
-#[derive(Debug)]
-struct Todo {
-    name: String,
-    status: TodoStatus
-}
-
-impl fmt::Display for Todo {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({}, {:?})", self.name, self.status)
-    }
-}
-
-impl Todo {
-    fn new(name: &str) -> Todo {
-        Todo {
-            name: name.trim().to_owned(),
-            status: TodoStatus::NotDone
-        }
-    }
-
-    fn new_from_file(name: &str, status: TodoStatus) -> Todo {
-        Todo {
-            name: name.trim().to_owned(),
-            status: status
-        }
-    }
 }

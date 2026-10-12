@@ -3,8 +3,7 @@ use std::fs::read_to_string;
 use std::io::Write;
 use std::path::Path;
 
-use crate::Todo;
-use crate::TodoStatus;
+use crate::todo::{Todo, TodoStatus};
 
 const FILE_PATH: &str = "./todos.txt";
 
@@ -24,7 +23,12 @@ pub(crate) fn write_todo_to_file(todo: &Todo) {
         .open(FILE_PATH)
         .expect("failed to open file");
 
-    write!(file, "{} - {:?}\n", todo.name, todo.status)
+    let numeric_status = match todo.status {
+        TodoStatus::Done => 1,
+        TodoStatus::NotDone => 0
+    };
+
+    write!(file, "{} | {}\n", todo.name, numeric_status)
         .expect("failed to writeln");
 }
 
@@ -36,12 +40,12 @@ pub(crate) fn get_all_todos_from_file() -> Vec<Todo> {
         .lines()
         .map(|line| {
             let (name, status) = line
-                .rsplit_once(" - ")
+                .rsplit_once(" | ")
                 .expect("invalid todo item");
 
             let status = match status {
-                "Done" => TodoStatus::Done,
-                "NotDone" => TodoStatus::NotDone,
+                "1" => TodoStatus::Done,
+                "0" => TodoStatus::NotDone,
                 _ => panic!("Invalid todo status: {status}"),
             };
             
